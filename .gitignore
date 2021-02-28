@@ -1,12 +1,11 @@
-# Atari 2600 (Stella) support for multiple assemblers
-# - DASM
-# - CC65
+# mypy
+.mypy_cache /
 
-# Assembled binaries and object directories
-obj/
-a.out
-*.bin
-*.a26
+# analyseur de type statique pytype
+.pytype /
 
-# Add in special Atari 7800-based binaries for good measure
-*.a78
+# Symboles de débogage Cython
+cython_debug /
+
+# __pycache__
+*.pyc
