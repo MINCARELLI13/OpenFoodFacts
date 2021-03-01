@@ -4,7 +4,7 @@
 print()
 
 """ Categories proposed to users """
-Categories = ('Snacks salés', 'Gâteaux', 'Sodas', 'Desserts glacés', 'Plats préparés')
+categories = (('Snacks salés'), ('Gâteaux'), ('Sodas'), ('Desserts glacés'), ('Plats préparés'))
 
 """ Number of products loaded by category """
 products_nb = 50
