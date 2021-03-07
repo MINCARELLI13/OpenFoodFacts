@@ -4,10 +4,10 @@
 print()
 
 """ Categories proposed to users """
-categories = (('Snacks salés'), ('Gâteaux'), ('Sodas'), ('Desserts glacés'), ('Plats préparés'))
+categories = ['Snacks salés', 'Gâteaux', 'Sodas', 'Desserts glacés', 'Plats préparés']
 
-""" Number of products loaded by category """
-products_nb = 50
+# number of products to load per category
+products_nb = 10
 
 """ user of MySQL """
 user = 'root'
@@ -20,3 +20,12 @@ host = 'localhost'
  
 """ database used """
 database = 'BDD_OFF'
+
+""" begin of URL of API """
+url = 'https://fr.openfoodfacts.org/cgi/search.pl'
+
+""" fields of the products to load """
+fields_of_products = ('url', 'product_name_fr',
+                    'brands', 'nutrition_grade_fr',
+                    'ingredients_text_fr', 'stores')
+                    
