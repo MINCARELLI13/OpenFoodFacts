@@ -1,6 +1,6 @@
+# coding: utf-8
 import mysql.connector
 import config
-
 
 class Tables_BDD_OFF:
 
@@ -78,7 +78,11 @@ class Tables_BDD_OFF:
             ENGINE = InnoDB "
         self.cursor.execute(query)
 
+
 if __name__ == '__main__':
     Tables = Tables_BDD_OFF()
-    Tables.drop_all_tables_BDD_OFF()
-    Tables.create_all_tables_BDD_OFF()
+    response_products = Tables.display_products(5)
+    for product in response_products:
+        print(product)
+    print()
+
