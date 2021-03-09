@@ -1,7 +1,8 @@
+# coding: utf-8
 import requests
 import mysql.connector
 import config
-from Create_Tables_BDD_OFF import Tables_BDD_OFF    # ligne à supprimer !!!
+from create_Tables_BDD_OFF import Tables_BDD_OFF    # ligne à supprimer !!!
 
 print()
 
