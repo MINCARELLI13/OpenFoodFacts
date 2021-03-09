@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import config
+from filling_BDD_OFF import Filling_of_BDD_OFF
 
 print()
 
@@ -14,7 +15,7 @@ class Menu:
     def select_action(self):
         """ asks to select one action among 4 proposed """
         actions = {
-                '1': 'Choisir une des catégories de produits',
+                '1': 'Rechercher un produit',
                 '2': 'Afficher les produits substitués',
                 '3': 'Réinitialiser la base de données',
                 '4': 'Quitter le programme'
@@ -74,11 +75,12 @@ class Menu:
 
     def reinitialisation_BDD_OFF(self):
         """ reinitializes the database BDD_OFF """
-        print('     def reinitialisation_BDD_OFF')
+        print()
+        print('Réinitialisation de la base de données en cours...')
+        return Filling_of_BDD_OFF()
 
     def quit_program(self):
         """ end of program """
-        # print('     def quit_program()')
         print()
         quit()
 
@@ -86,6 +88,4 @@ class Menu:
 if __name__=='__main__':
     menu = Menu()
     print()
-    # print('menu.action_chosen :', menu.action_chosen)
-    # print('menu.category_chosen :', menu.category_chosen)
 
