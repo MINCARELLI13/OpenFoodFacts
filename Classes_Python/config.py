@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 print()
@@ -28,4 +27,5 @@ url = 'https://fr.openfoodfacts.org/cgi/search.pl'
 fields_of_products = ('url', 'product_name_fr',
                     'brands', 'nutrition_grade_fr',
                     'ingredients_text_fr', 'stores')
-                    
+
+name_of_product_fields = ('nom', 'marque', 'url', 'nutriscore', 'ingrédients', 'magasins')
