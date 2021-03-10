@@ -29,3 +29,5 @@ fields_of_products = ('url', 'product_name_fr',
                     'ingredients_text_fr', 'stores')
 
 name_of_product_fields = ('nom', 'marque', 'url', 'nutriscore', 'ingrédients', 'magasins')
+
+nb_of_substituts = 5
