@@ -11,35 +11,27 @@ print()
 # Tables.drop_all_tables_BDD_OFF()
 # Tables.create_all_tables_BDD_OFF()
 
-class Filling_of_BDD_OFF:
+class Filling_of_BDD_OFF(Tables_BDD_OFF):
     """ Creation and loading of the tables of the database BDD_OFF """
 
     # def __init__(self, cnx, cursor):
     def __init__(self):
         """ connection to SQL """
-        # Tables_BDD_OFF.__init__(self, cnx, cursor)
-        self.Tables = Tables_BDD_OFF()
+        Tables_BDD_OFF.__init__(self)
         self.Categories_id = {}
-        self.reinitialisation_of_tables()
-        self.insertion_fields_of_Category()
-        self.research_id_of_categories()
-        self.filling_table_Product()
-        # self.cnx = self.Tables.cnx
-        # self.cursor = self.Tables.cursor
-
 
     def reinitialisation_of_tables(self):
         """ Drop all tables of database BDD_OFF and recreate them """
-        self.Tables.drop_all_tables_BDD_OFF()
-        self.Tables.create_all_tables_BDD_OFF()
+        self.drop_all_tables_BDD_OFF()
+        self.create_all_tables_BDD_OFF()
 
     def insertion_fields_of_Category(self):
         """ Insertion of the types of categories in database BDD_OFF
         (Snacks salés, Gâteaux, Sodas...) """
         for catg in config.categories:
             query = f"INSERT INTO Category (name) VALUES ('{catg}')"
-            self.Tables.cursor.execute(query)
-            self.Tables.cnx.commit()
+            self.cursor.execute(query)
+            self.cnx.commit()
 
     def research_id_of_categories(self):
         """ researching id's of 'Category' table of BDD_OFF
@@ -48,8 +40,9 @@ class Filling_of_BDD_OFF:
         {'Snacks':1, 'Gâteaux':2, 'Sodas':3, 'Glace':4, 'Plats':5}
         """
         query = f"SELECT id, name FROM Category"
-        self.Tables.cursor.execute(query)
-        for (cat_id, cat_name) in self.Tables.cursor:
+        self.cursor.execute(query)
+        # for (cat_id, cat_name) in self.Tables.cursor:
+        for (cat_id, cat_name) in self.cursor:
         # print('CATEGORY-Cat_Id :', cat_name, ', id :', cat_id)
             self.Categories_id[cat_name] = cat_id
         # print('     Categories_id :',Categories_id)
@@ -113,13 +106,20 @@ class Filling_of_BDD_OFF:
                                     VALUES ('{Nom}', '{Marque}', \
                                     '{URL_nb}', '{Nutriscore}', \
                                     '{Ingredients}',' {Magasins}', '{cat}')"
-                            self.Tables.cursor.execute(query)
-                            self.Tables.cnx.commit()
+                            self.cursor.execute(query)
+                            self.cnx.commit()
 
                 except KeyError as msg:
                     pass
                     # !!!  à supprimer avant la présentation  !!!
                     print("     Il manque la clé", msg)
+
+    def filling_table_Substitutes(self, original_id, substitut_id):
+        """ Insertion of substitut of a product in database BDD_OFF """
+        query = f"INSERT INTO Substitutes (original_id, substitut_id) \
+                VALUES ('{original_id}', '{substitut_id}')"
+        self.cursor.execute(query)
+        self.cnx.commit()
 
 
 if __name__=='__main__':
