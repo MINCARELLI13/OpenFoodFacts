@@ -13,6 +13,7 @@ class Menu(Tables_BDD_OFF):
     def __init__(self):
         Tables_BDD_OFF.__init__(self)
         self.request = Requests()
+        self.fill = Filling_of_BDD_OFF()
         # 4 possible actions from 1 to 4
         self.action_chosen = self.select_action()
 
@@ -51,25 +52,25 @@ class Menu(Tables_BDD_OFF):
                 }
         return actions[self.action_chosen]()
 
+    def make_a_choice(self, question, choices):
+        """ ask a question and wait for a choice among several """
+
+
+
     def select_category(self):
         """ asks to select one category of products
             among 5 proposed """
         os.system('CLS')
-        print("Choix d'une catégorie de produits")
-        print()
         # displays the choise of 5 categories for select
         [print(i, '-', config.categories[i-1]) for i in range(1, 6)]
         print()
-
-        cat = int(input('Sélectionnez une catégorie : '))
+        cat = int(input('Sélectionnez une catégorie de produits : '))
         # asks to select one category of products among 5 proposed
         while cat not in range(1,6):
             os.system('CLS')
-            print("Choix d'une catégorie de produits")
-            print()
             [print(i, '-', config.categories[i-1]) for i in range(1, 6)]
             print()
-            cat = int(input('Sélectionnez une catégorie (1 à 5) : '))
+            cat = int(input('Sélectionnez une catégorie de produits (1 à 5) : '))
         print()
         self.display_products(cat)
         # return cat
@@ -77,33 +78,33 @@ class Menu(Tables_BDD_OFF):
     def display_products(self, catg_id):
         """ displays finded products of choosed category """
         os.system('CLS')
-        print('Affichage des produits trouvés pour la catégorie "',
-            config.categories[catg_id-1],'" :')
-        print()
-        query = f" SELECT * FROM Product WHERE Product.category_id='{catg_id}' "
-        self.cursor.execute(query)
-        # displaying of products
-        response_products = self.cursor.fetchall()
-        increment = 0
+        # loading of all product from a category
+        response_products = self.request.find_products_on_Category(catg_id)
+        # selection of a product
+        increment = 1
         for product in response_products:
+            print(increment, '-', end=' ')
+            for i in range (1, len(product)):
+                print(product[i], end=', ')
             increment += 1
-            print(increment, '-', product)
+            print()
         print()
         choice_product = int(input("Sélectionnez un produit (ou '0' pour quitter) : "))
-        while choice_product not in range(0,increment+1):
+        while choice_product not in range(0,increment):
             os.system('CLS')
-            print('Affichage des produits trouvés pour la catégorie "',
-                config.categories[catg_id-1],'" :')
-            print()
-            increment = 0
+            # selection of a product
+            increment = 1
             for product in response_products:
+                print(increment, '-', end=' ')
+                for i in range (1, len(product)):
+                    print(product[i], end=', ')
                 increment += 1
-                print(increment, '-', product)
+                print()
             print()
             choice_product = int(input("Sélectionnez un produit (ou '0' pour quitter) : "))
         print('Choice_product :', choice_product)
         if choice_product == 0:
-            self.quit_program()            
+            self.quit_program()     
         else:
             os.system('CLS')
             print('Affichage du produit sélectionné pour la catégorie "',
@@ -210,10 +211,46 @@ class Menu(Tables_BDD_OFF):
                                 response_substituts[choice_record-1][i])
                         print()
                         choice_Yes_No = input("Voulez-vous enregistrer ce substitut ? (O/N) : ").upper()
-                    print('Choice_Yes_No :', choice_Yes_No)
-
-                    
-
+                    # print('Choice_Yes_No :', choice_Yes_No)
+                    if choice_Yes_No == 'O':
+                        if not self.request.exist_duplicate_in_Category(response_products[choice_product-1][0],
+                                                                        response_substituts[choice_record-1][0]):
+                            self.fill.filling_table_Substitutes(response_products[choice_product-1][0],
+                                                            response_substituts[choice_record-1][0])
+                        else:
+                            print('ATTENTION : le substitut sélectionné a déjà été enregistré pour ce produit !')
+                            print()
+                            # displays the product to substitut
+                        print('Produit à remplacer par un substitut :')
+                        for i in range(1,7):
+                            print('  ',config.name_of_product_fields[i-1], ' :',
+                                response_products[choice_product-1][i])
+                        print()
+                        # displays the substitut of product
+                        print('Affichage du substitut sélectionné pour le produit ci-dessus :')
+                        for i in range(1,7):
+                            print('  ',config.name_of_product_fields[i-1], ' :',
+                                response_substituts[choice_record-1][i])
+                        print()
+                        # proposes to record a substitut
+                        choice_Yes_No = ""
+                        choice_Yes_No = input("Voulez-vous rechercher un autre substitut au produit ? (O/N) : ").upper()
+                        while choice_Yes_No not in ['O', 'N']:
+                            os.system('CLS')
+                            # displays the product to substitut
+                            for i in range(1,7):
+                                print('  ',config.name_of_product_fields[i-1], ' :',
+                                        response_products[choice_product-1][i])
+                            print()
+                            choice_Yes_No = input("Voulez-vous rechercher un autre substitut au produit ? (O/N) : ").upper()
+                        if choice_Yes_No == 'O':
+                            os.system('CLS')
+                            self.select_action()
+                        else:
+                            self.quit_program()
+                    else:
+                        os.system('CLS')
+                        self.select_action()
 
 
     def display_substituts(self):
