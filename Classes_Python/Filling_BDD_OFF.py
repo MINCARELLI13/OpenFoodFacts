@@ -25,7 +25,7 @@ class Filling_of_BDD_OFF(Tables_BDD_OFF):
         self.drop_all_tables_BDD_OFF()
         self.create_all_tables_BDD_OFF()
 
-    def insertion_fields_of_Category(self):
+    def filling_table_Category(self):
         """ Insertion of the types of categories in database BDD_OFF
         (Snacks salés, Gâteaux, Sodas...) """
         for catg in config.categories:
@@ -64,7 +64,6 @@ class Filling_of_BDD_OFF(Tables_BDD_OFF):
             # selects only useful informations on products
             infos_of_products = req.json().get('products')
             # print(infos_of_products)
-
 
         # selects only usables informations
             for info in infos_of_products:
