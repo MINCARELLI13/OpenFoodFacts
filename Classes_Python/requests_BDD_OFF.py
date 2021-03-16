@@ -41,7 +41,8 @@ class Requests (Tables_BDD_OFF):
         return substituts_list
 
     def exist_duplicate_in_Category(self, origin_id, substit_id):
-        """ finds if duplicate (origin_id, substitut_id) already exists in the Substitutes' table """
+        """ finds if duplicate (origin_id, substitut_id)
+            already exists in the Substitutes' table """
         query = f"SELECT original_id, substitut_id FROM Substitutes"
         self.cursor.execute(query)
         # search duplicate of (origin_id, substitut_id)
@@ -50,4 +51,32 @@ class Requests (Tables_BDD_OFF):
             if curseur == (origin_id, substit_id):
                 presence = True
         return presence
-                   
+
+    def load_substituts(self):
+        """ loads all substituts of database BDD_OFF
+            In reception : nothing
+            On return    : dictionnary for which key = product_id and values = substitutes_id
+            like {1: [6], 32: [31, 38], 34: [31, 33, 38, 39]} """
+        query = f"SELECT original_id, substitut_id FROM Substitutes"
+        self.cursor.execute(query)
+        # loads results in dictionnary
+        substituts_dico = {}
+        for curseur in self.cursor:
+                if (curseur[0] in substituts_dico):
+                    # print('clé déjà existante :', substituts_dico[curseur[0]], [curseur[1]])
+                    substituts_dico[curseur[0]] = substituts_dico[curseur[0]] + [curseur[1]]
+                else:
+                    # print('clé inexistante :', curseur[1])
+                    substituts_dico[curseur[0]] = [curseur[1]]
+        # print('Sorted :', substituts_dico)
+        return substituts_dico
+
+    def replace_id_by_name(self, id):
+        """ replace the product id's by name and brand of product
+            In reception : receives the 'id' of one product
+            On return    : return a tuple (name, brand) of the product
+        """
+        query = f"SELECT name, brand FROM Product WHERE id = '{id}'"
+        self.cursor.execute(query)
+        product = self.cursor.fetchone()
+        return product[0] + '(' + product[1] + ')'
