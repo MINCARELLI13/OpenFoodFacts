@@ -15,9 +15,31 @@ class Menu(Tables_BDD_OFF):
         self.request = Requests()
         self.fill = Filling_of_BDD_OFF()
         # 4 possible actions from 1 to 4
-        self.action_chosen = self.select_action()
+        # self.action_chosen = self.main_menu()
+        self.main_menu()
 
-    def select_action(self):
+    def make_a_choice(self, question, dico_choices):
+        """ ask a 'question' and wait for a choice among several """
+        # displays the possible actions
+        os.system('CLS')
+        [print(key, '- ', dico_choices[key]) for key in dico_choices.keys()]
+        print()
+        # make liste of choices numbers : ['1', '2', '3', '4'...]
+        choices_nb = []
+        for i in range(1, len(dico_choices)+1):
+            choices_nb.append(str(i))
+        # waits for the chosen action by user
+        action = str(input(question))
+        question = question + '(1 à ' + str(len(choices_nb)) + ') : '
+        while action not in choices_nb:
+            os.system('CLS')
+            [print(key, '- ', dico_choices[key]) for key in dico_choices.keys()]
+            print()
+            action = str(input(question))
+        return action
+
+
+    def main_menu(self):
         """ asks to select one action among 4 proposed """
         actions = {
                 '1': 'Rechercher un produit',
@@ -25,87 +47,55 @@ class Menu(Tables_BDD_OFF):
                 '3': 'Réinitialiser la base de données',
                 '4': 'Quitter le programme'
                 }
-
-        # displays the 4 possible actions
-        os.system('CLS')
-        [print(key, '- ', actions[key]) for key in actions.keys()]
-        print()
-
-        # waits for the chosen action by user
-        action = str(input('Sélectionnez une action : '))
-        while action not in ['1', '2', '3', '4']:
-            os.system('CLS')
-            [print(key, '- ', actions[key]) for key in actions.keys()]
-            print()
-            action = str(input('Sélectionnez une action (1 à 4) : '))
-        
-        self.action_chosen = action
-        return self.execute_action()
-    
-    def execute_action(self):
-        """ executes action choosed in the 'select_action' procedure """ 
+        question = "Sélectionnez une action : "
+        choice = self.make_a_choice(question, actions)
+        # executes action choosed
         actions = {
-                '1': self.select_category,
+                '1': self.category_menu,
                 '2': self.display_substituts,
                 '3': self.reinitialisation_BDD_OFF,
                 '4': self.quit_program
                 }
-        return actions[self.action_chosen]()
+        return actions[choice]()
 
-    def make_a_choice(self, question, choices):
-        """ ask a question and wait for a choice among several """
-
-
-
-    def select_category(self):
+    def category_menu(self):
         """ asks to select one category of products
             among 5 proposed """
-        os.system('CLS')
-        # displays the choise of 5 categories for select
-        [print(i, '-', config.categories[i-1]) for i in range(1, 6)]
+        question = "Sélectionnez une catégorie de produits : "
+        choice = self.make_a_choice(question, config.categories)
         print()
-        cat = int(input('Sélectionnez une catégorie de produits : '))
-        # asks to select one category of products among 5 proposed
-        while cat not in range(1,6):
-            os.system('CLS')
-            [print(i, '-', config.categories[i-1]) for i in range(1, 6)]
-            print()
-            cat = int(input('Sélectionnez une catégorie de produits (1 à 5) : '))
-        print()
-        self.display_products(cat)
-        # return cat
+        self.display_products(choice)
 
     def display_products(self, catg_id):
         """ displays finded products of choosed category """
         os.system('CLS')
         # loading of all product from a category
         response_products = self.request.find_products_on_Category(catg_id)
-        # selection of a product
+        dico_choices = {}
         increment = 1
         for product in response_products:
-            print(increment, '-', end=' ')
-            for i in range (1, len(product)):
-                print(product[i], end=', ')
+            liste_of_products = [item for item in product]
+            dico_choices[str(increment)] = ", ".join(liste_of_products)
             increment += 1
-            print()
+        question = "Sélectionnez un produit : "
+        choice_product = int(self.make_a_choice(question, dico_choices))
         print()
-        choice_product = int(input("Sélectionnez un produit (ou '0' pour quitter) : "))
-        while choice_product not in range(0,increment):
-            os.system('CLS')
-            # selection of a product
-            increment = 1
-            for product in response_products:
-                print(increment, '-', end=' ')
-                for i in range (1, len(product)):
-                    print(product[i], end=', ')
-                increment += 1
-                print()
-            print()
-            choice_product = int(input("Sélectionnez un produit (ou '0' pour quitter) : "))
-        print('Choice_product :', choice_product)
-        if choice_product == 0:
-            self.quit_program()     
-        else:
+
+        # selection of a product
+        os.system('CLS')
+        print('Affichage du produit sélectionné pour la catégorie "',
+                config.categories[catg_id],'" :')
+                # config.categories[catg_id-1],'" :')
+        print()
+        for i in range(0, 7):
+            print('  ',config.name_of_product_fields[i-1], ' :',
+                response_products[choice_product-1][i])
+        print()
+        choice_substitut = int(input("Sélectionnez une option"
+                " (1- chercher un substitut;"
+                " 2- retour au menu principal;"
+                " 3- quitter l'application) : "))
+        while choice_substitut not in range(1,4):
             os.system('CLS')
             print('Affichage du produit sélectionné pour la catégorie "',
                     config.categories[catg_id-1],'" :')
@@ -115,45 +105,45 @@ class Menu(Tables_BDD_OFF):
                     response_products[choice_product-1][i])
             print()
             choice_substitut = int(input("Sélectionnez une option"
-                    " (1- chercher un substitut;"
-                    " 2- retour au menu principal;"
-                    " 3- quitter l'application) : "))
-            while choice_substitut not in range(1,4):
-                os.system('CLS')
-                print('Affichage du produit sélectionné pour la catégorie "',
-                        config.categories[catg_id-1],'" :')
-                print()
-                for i in range(1,7):
-                    print('  ',config.name_of_product_fields[i-1], ' :',
-                        response_products[choice_product-1][i])
-                print()
-                choice_substitut = int(input("Sélectionnez une option"
-                    " (1-chercher un substitut;"
-                    " 2-retour au menu principal;"
-                    " 3-quitter l'application) : "))
-                print()
+                " (1-chercher un substitut;"
+                " 2-retour au menu principal;"
+                " 3-quitter l'application) : "))
             print()
-            if choice_substitut == 3:
+        print()
+        if choice_substitut == 3:
+            os.system('CLS')
+            print('Arrêt du programme demandé...')
+            print()
+            quit()
+        elif choice_substitut == 2:
+            os.system('CLS')
+            self.main_menu()
+        else:
+            os.system('CLS')
+            response_substituts = self.request.find_substituts(catg_id)
+            # selection of the useful substituts
+            response_substituts = self.select_useful_substituts(
+                response_substituts, response_products[choice_product-1][4])
+            print(response_substituts)
+            # displays the product to substitut
+            print('Produit à remplacer par un substitut :')
+            for i in range(1,7):
+                print('  ',config.name_of_product_fields[i-1], ' :',
+                    response_products[choice_product-1][i])
+            print()
+            # displays the substituts of product
+            print('Substituts trouvés pour le produit ci-dessus :')
+            increment = 0
+            for response_substitut in response_substituts:
+                increment += 1
+                print(increment, '-', response_substitut)
+            print()
+            # proposes to select a substitut to record
+            choice_record = int(input("Sélectionnez un substitut à enregistrer (ou '0' pour revenir au menu) : "))
+            print('len(response_substituts) :', len(response_substituts))
+            while choice_record not in range(0,len(response_substituts)+1):
                 os.system('CLS')
-                print('Arrêt du programme demandé...')
-                print()
-                quit()
-            elif choice_substitut == 2:
-                os.system('CLS')
-                self.select_action()
-            else:
-                os.system('CLS')
-                response_substituts = self.request.find_substituts(catg_id)
-                # selection of the useful substituts
-                response_substituts = self.select_useful_substituts(
-                    response_substituts, response_products[choice_product-1][4])
-                print(response_substituts)
-                # displays the product to substitut
-                print('Produit à remplacer par un substitut :')
-                for i in range(1,7):
-                    print('  ',config.name_of_product_fields[i-1], ' :',
-                        response_products[choice_product-1][i])
-                print()
+                print('len(response_substituts) :', len(response_substituts))
                 # displays the substituts of product
                 print('Substituts trouvés pour le produit ci-dessus :')
                 increment = 0
@@ -161,26 +151,29 @@ class Menu(Tables_BDD_OFF):
                     increment += 1
                     print(increment, '-', response_substitut)
                 print()
-                # proposes to select a substitut to record
-                choice_record = int(input("Sélectionnez un substitut à enregistrer (ou '0' pour revenir au menu) : "))
-                print('len(response_substituts) :', len(response_substituts))
-                while choice_record not in range(0,len(response_substituts)+1):
-                    os.system('CLS')
-                    print('len(response_substituts) :', len(response_substituts))
-                    # displays the substituts of product
-                    print('Substituts trouvés pour le produit ci-dessus :')
-                    increment = 0
-                    for response_substitut in response_substituts:
-                        increment += 1
-                        print(increment, '-', response_substitut)
-                    print()
-                    choice_record = int(input("Sélectionnez un substitut"
-                            " à enregistrer (ou '0' pour revenir au menu) : "))
-                print('Choice_record :', choice_record)
-                if choice_record == 0:
-                    os.system('CLS')
-                    self.select_action()
-                else:
+                choice_record = int(input("Sélectionnez un substitut"
+                        " à enregistrer (ou '0' pour revenir au menu) : "))
+            print('Choice_record :', choice_record)
+            if choice_record == 0:
+                os.system('CLS')
+                self.main_menu()
+            else:
+                os.system('CLS')
+                # displays the product to substitut
+                print('Produit à remplacer par un substitut :')
+                for i in range(1,7):
+                    print('  ',config.name_of_product_fields[i-1], ' :',
+                        response_products[choice_product-1][i])
+                print()
+                # displays the substitut of product
+                print('Affichage du substitut sélectionné pour le produit ci-dessus :')
+                for i in range(1,7):
+                    print('  ',config.name_of_product_fields[i-1], ' :',
+                        response_substituts[choice_record-1][i])
+                print()
+                # proposes to record a substitut
+                choice_Yes_No = input("Voulez-vous enregistrer ce substitut ? (O/N) : ").upper()
+                while choice_Yes_No not in ['O', 'N']:
                     os.system('CLS')
                     # displays the product to substitut
                     print('Produit à remplacer par un substitut :')
@@ -194,77 +187,61 @@ class Menu(Tables_BDD_OFF):
                         print('  ',config.name_of_product_fields[i-1], ' :',
                             response_substituts[choice_record-1][i])
                     print()
-                    # proposes to record a substitut
                     choice_Yes_No = input("Voulez-vous enregistrer ce substitut ? (O/N) : ").upper()
-                    while choice_Yes_No not in ['O', 'N']:
-                        os.system('CLS')
-                        # displays the product to substitut
-                        print('Produit à remplacer par un substitut :')
-                        for i in range(1,7):
-                            print('  ',config.name_of_product_fields[i-1], ' :',
-                                response_products[choice_product-1][i])
-                        print()
-                        # displays the substitut of product
-                        print('Affichage du substitut sélectionné pour le produit ci-dessus :')
-                        for i in range(1,7):
-                            print('  ',config.name_of_product_fields[i-1], ' :',
-                                response_substituts[choice_record-1][i])
-                        print()
-                        choice_Yes_No = input("Voulez-vous enregistrer ce substitut ? (O/N) : ").upper()
-                    # print('Choice_Yes_No :', choice_Yes_No)
-                    if choice_Yes_No == 'O':
-                        if not self.request.exist_duplicate_in_Category(response_products[choice_product-1][0],
-                                                                        response_substituts[choice_record-1][0]):
-                            self.fill.filling_table_Substitutes(response_products[choice_product-1][0],
-                                                            response_substituts[choice_record-1][0])
-                        else:
-                            os.system('CLS')
-                            print('\t ATTENTION : le substitut sélectionné a déjà été enregistré pour ce produit !')
-                            print()
-                            # displays the product to substitut
-                            print('Produit à remplacer par un substitut :', end=' ')
-                            print(response_products[choice_product-1][1], end=' ')
-                            print('(', response_products[choice_product-1][2], ')')
-                            print()
-                            # displays the substitut of product
-                            print('Substitut sélectionné :', end=' ')
-                            print(response_substituts[choice_record-1][1], end=' ')
-                            print('(', response_substituts[choice_record-1][2], ')')
-                            print()
-                            print()
-                            # proposes to record a substitut
-                            choice_Yes_No = ""
-                            choice_Yes_No = input("Voulez-vous rechercher un autre substitut au produit ? (O/N) : ").upper()
-                            while choice_Yes_No not in ['O', 'N']:
-                                os.system('CLS')
-                                # displays the product to substitut
-                                for i in range(1,7):
-                                    print('  ',config.name_of_product_fields[i-1], ' :',
-                                            response_products[choice_product-1][i])
-                                print()
-                                choice_Yes_No = input("Voulez-vous rechercher un autre substitut au produit ? (O/N) : ").upper()
-                            if choice_Yes_No == 'O':
-                                os.system('CLS')
-                                self.select_action()
-                            else:
-                                self.quit_program()
+                # print('Choice_Yes_No :', choice_Yes_No)
+                if choice_Yes_No == 'O':
+                    if not self.request.exist_duplicate_in_Category(response_products[choice_product-1][0],
+                                                                    response_substituts[choice_record-1][0]):
+                        self.fill.filling_table_Substitutes(response_products[choice_product-1][0],
+                                                        response_substituts[choice_record-1][0])
                     else:
                         os.system('CLS')
-                        self.select_action()
+                        print('\t ATTENTION : le substitut sélectionné a déjà été enregistré pour ce produit !')
+                        print()
+                        # displays the product to substitut
+                        print('Produit à remplacer par un substitut :', end=' ')
+                        print(response_products[choice_product-1][1], end=' ')
+                        print('(', response_products[choice_product-1][2], ')')
+                        print()
+                        # displays the substitut of product
+                        print('Substitut sélectionné :', end=' ')
+                        print(response_substituts[choice_record-1][1], end=' ')
+                        print('(', response_substituts[choice_record-1][2], ')')
+                        print()
+                        print()
+                        # proposes to record a substitut
+                        choice_Yes_No = ""
+                        choice_Yes_No = input("Voulez-vous rechercher un autre substitut au produit ? (O/N) : ").upper()
+                        while choice_Yes_No not in ['O', 'N']:
+                            os.system('CLS')
+                            # displays the product to substitut
+                            for i in range(1,7):
+                                print('  ',config.name_of_product_fields[i-1], ' :',
+                                        response_products[choice_product-1][i])
+                            print()
+                            choice_Yes_No = input("Voulez-vous rechercher un autre substitut au produit ? (O/N) : ").upper()
+                        if choice_Yes_No == 'O':
+                            os.system('CLS')
+                            self.main_menu()
+                        else:
+                            self.quit_program()
+                else:
+                    os.system('CLS')
+                    self.main_menu()
 
 
     def display_substituts(self):
         """ displays the recorded substituts """
         os.system('CLS')
-        print('Affichage des produits et de leurs substituts :')
+        print("\t Affichage des produits et de leurs substituts")
         print()
         substituts_id_result = self.request.load_substituts()
         for product_id in substituts_id_result:
             product = self.request.replace_id_by_name(product_id)
-            print("* Substitut(s) au produit '", product, "' :", product_id)
+            print("* Substitut(s) au produit '", product, "':")
             for  substitut_id in substituts_id_result[product_id]:
                 substitut = self.request.replace_id_by_name(substitut_id)
-                print("\t -", substitut, substitut_id)
+                print("\t -", substitut)
             print()
 
     def reinitialisation_BDD_OFF(self):
@@ -274,6 +251,7 @@ class Menu(Tables_BDD_OFF):
         self.fill.reinitialisation_of_tables()
         self.fill.filling_table_Category()
         self.fill.filling_table_Product()
+        print()
         print('Base de données réinitialisée')
 
     def quit_program(self):
