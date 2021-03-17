@@ -3,7 +3,8 @@
 print()
 
 """ Categories proposed to users """
-categories = ['Snacks salés', 'Gâteaux', 'Sodas', 'Desserts glacés', 'Plats préparés']
+# categories = ['Snacks salés', 'Gâteaux', 'Sodas', 'Desserts glacés', 'Plats préparés']
+categories = {'1': 'Snacks salés', '2': 'Gâteaux','3': 'Sodas','4': 'Desserts glacés','5': 'Plats préparés'}
 
 # number of products to load per category
 products_nb = 10
